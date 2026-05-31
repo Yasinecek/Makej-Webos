@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>makej. — najdi brigádu</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+  <style>
+    :root { color-scheme: dark; }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body, #root { width: 100%; height: 100%; }
+    html, body {
+      margin: 0; padding: 0;
+      background: #07071a;
+      font-family: "Plus Jakarta Sans", -apple-system, system-ui, sans-serif;
+      color: #fff;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+    }
+    iconify-icon { display: inline-flex; line-height: 0; }
+    @keyframes empSpin { to { transform: rotate(360deg); } }
+    @keyframes wPop { 0% { transform: scale(0.85) translateY(20px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+    @keyframes peekerIn { 0% { transform: translateY(56px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+
+    #auth-gate {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(180deg, #2a2ab5 0%, #050510 100%);
+      z-index: 9999;
+    }
+    #auth-gate.hidden { display: none; }
+
+    .gate-card {
+      background: rgba(22,22,59,0.9);
+      border: 1px solid rgba(208,208,255,0.12);
+      border-radius: 1.5rem;
+      padding: 2.5rem;
+      width: min(420px, calc(100vw - 40px));
+      text-align: center;
+      animation: wPop .4s cubic-bezier(.2,.8,.2,1);
+    }
+    .gate-logo { font-family: Inter, sans-serif; font-size: 2.2rem; font-weight: 900; background: linear-gradient(135deg, #7c7cff, #d0d0ff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.25rem; }
+    .gate-sub { color: #FFD166; font-size: 0.75rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 1.75rem; }
+    .gate-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem; color: #fff; }
+    .gate-desc { color: #9999cc; font-size: 0.9rem; margin-bottom: 1.5rem; line-height: 1.5; }
+    .gate-tabs { display: flex; gap: 8px; margin-bottom: 1.5rem; background: rgba(255,255,255,0.04); border-radius: 10px; padding: 4px; }
+    .gate-tab { flex: 1; padding: 8px; border-radius: 7px; border: none; background: transparent; color: #9999cc; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; }
+    .gate-tab.active { background: rgba(91,107,255,0.25); color: #fff; }
+    .gate-error { background: rgba(244,63,94,0.12); border: 1px solid rgba(244,63,94,0.3); border-radius: 0.75rem; padding: 10px 14px; color: #f87171; font-size: 0.875rem; margin-bottom: 1rem; display: none; }
+    .gate-input { width: 100%; padding: 11px 15px; background: rgba(255,255,255,0.04); border: 1px solid rgba(208,208,255,0.14); border-radius: 0.75rem; color: #fff; font-family: inherit; font-size: 0.95rem; outline: none; margin-bottom: 0.75rem; transition: border-color .2s; }
+    .gate-input:focus { border-color: rgba(208,208,255,0.4); }
+    .gate-input::placeholder { color: #6e6ea8; }
+    .gate-btn { width: 100%; padding: 13px; background: linear-gradient(135deg, #292978, #3a3a99); border: none; border-radius: 0.75rem; color: #fff; font-family: inherit; font-size: 1rem; font-weight: 700; cursor: pointer; margin-bottom: 1rem; transition: opacity .2s; }
+    .gate-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .gate-link { color: #9999cc; font-size: 0.85rem; cursor: pointer; background: none; border: none; font-family: inherit; }
+    .gate-link:hover { color: #d0d0ff; }
+    .gate-divider { display: flex; align-items: center; gap: 10px; margin: 0 0 1rem; color: #6e6ea8; font-size: 12px; }
+    .gate-divider::before, .gate-divider::after { content: ''; flex: 1; height: 1px; background: rgba(208,208,255,0.1); }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(208,208,255,0.12); border-radius: 6px; }
+    button, input, textarea, select { font-family: inherit; }
+  </style>
+</head>
+<body>
+
+<div id="auth-gate">
+  <div style="display:flex;flex-direction:row;align-items:center;justify-content:center;gap:56px;width:100%;padding:0 20px;">
+
+  <!-- ── Studio: plný karakter vedle karty ─────────────────────── -->
+  <div style="display:flex;flex-direction:column;align-items:center;gap:0;">
+    <div id="peeker-s" style="
+      position:relative;
+      animation: peekerIn 0.55s cubic-bezier(.2,.8,.2,1) 0.2s both;
+      pointer-events:none;
+      filter: drop-shadow(0 20px 48px rgba(0,0,80,0.7)) drop-shadow(0 0 1px rgba(140,140,255,0.5));
+    ">
+
+      <!-- ── Mini čepička ──────────────────────────────────────── -->
+      <div style="position:absolute;top:-36px;left:50%;transform:translateX(-46%) rotate(-8deg);z-index:3;">
+        <!-- Kopule -->
+        <div style="
+          width:64px; height:32px; margin:0 auto; position:relative;
+          background: linear-gradient(150deg, #2424aa 0%, #0e0e60 100%);
+          border-radius: 50% 50% 8px 8px;
+          box-shadow: inset 0 3px 0 rgba(255,255,255,0.15);
+        ">
+          <div style="
+            position:absolute; bottom:5px; left:50%; transform:translateX(-50%);
+            font-family:'Plus Jakarta Sans',sans-serif; font-size:14px; font-weight:900;
+            color:#fff; line-height:1;
+            text-shadow: 0 0 8px rgba(91,107,255,0.7);
+          ">M</div>
+        </div>
+        <!-- Kšilt -->
+        <div style="
+          width:82px; height:9px; margin:-1px auto 0;
+          background: linear-gradient(180deg, #1a1a90, #0b0b55);
+          border-radius: 3px 3px 40% 40%;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        "></div>
+      </div>
+
+      <!-- ── Hlava ─────────────────────────────────────────────── -->
+      <div style="
+        width:176px; height:152px;
+        background: linear-gradient(160deg, #4848c4 0%, #1c1c7a 100%);
+        border-radius: 50% 50% 44% 44%;
+        position:relative;
+        box-shadow: inset 0 2px 0 rgba(255,255,255,0.18);
+        border: 4px solid rgba(140,140,255,0.3);
+      ">
+        <div id="browL-s" style="position:absolute;left:26px;top:30px;width:36px;height:6px;background:rgba(190,190,255,0.6);border-radius:4px;transition:transform 0.22s ease;"></div>
+        <div id="browR-s" style="position:absolute;right:26px;top:30px;width:36px;height:6px;background:rgba(190,190,255,0.6);border-radius:4px;transition:transform 0.22s ease;"></div>
+        <div id="eyeL-s" style="
+          position:absolute; left:30px; top:56px;
+          width:42px; height:42px;
+          background:white; border-radius:50%;
+          display:flex; align-items:center; justify-content:center;
+          overflow:hidden; box-shadow: inset 0 2px 6px rgba(0,0,0,0.12);
+        ">
+          <div id="pupilL-s" style="width:22px;height:22px;background:#16163c;border-radius:50%;transition:transform 0.09s ease;position:relative;">
+            <div style="position:absolute;width:6px;height:6px;background:rgba(255,255,255,0.9);border-radius:50%;top:2px;right:2px;"></div>
+          </div>
+          <div id="lidL-s" style="position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(180deg,#5050c8,#3030a0);transition:height 0.3s cubic-bezier(.4,0,.2,1);z-index:2;"></div>
+        </div>
+        <div id="eyeR-s" style="
+          position:absolute; right:30px; top:56px;
+          width:42px; height:42px;
+          background:white; border-radius:50%;
+          display:flex; align-items:center; justify-content:center;
+          overflow:hidden; box-shadow: inset 0 2px 6px rgba(0,0,0,0.12);
+        ">
+          <div id="pupilR-s" style="width:22px;height:22px;background:#16163c;border-radius:50%;transition:transform 0.09s ease;position:relative;">
+            <div style="position:absolute;width:6px;height:6px;background:rgba(255,255,255,0.9);border-radius:50%;top:2px;right:2px;"></div>
+          </div>
+          <div id="lidR-s" style="position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(180deg,#5050c8,#3030a0);transition:height 0.3s cubic-bezier(.4,0,.2,1);z-index:2;"></div>
+        </div>
+        <div style="position:absolute;bottom:22px;left:14px;width:32px;height:16px;border-radius:50%;background:rgba(255,100,150,0.22);"></div>
+        <div style="position:absolute;bottom:22px;right:14px;width:32px;height:16px;border-radius:50%;background:rgba(255,100,150,0.22);"></div>
+      </div>
+    </div>
+    <div style="margin-top:16px;color:rgba(150,150,200,0.35);font-size:10px;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:0.1em;text-transform:uppercase;">studio</div>
+  </div>
+
+  <!-- ── Originál: karta + peeker nahoře ───────────────────────── -->
+  <div style="display:flex;flex-direction:column;align-items:center;">
+
+  <!-- Peeker character -->
+  <div id="peeker" style="
+    position:relative; z-index:1;
+    margin-bottom:-18px;
+    display:flex; justify-content:center;
+    pointer-events:none;
+    animation: peekerIn 0.55s cubic-bezier(.2,.8,.2,1) 0.2s both;
+    transition: transform 0.4s cubic-bezier(.2,.8,.2,1);
+  ">
+    <div style="
+      width:88px; height:76px;
+      background: linear-gradient(160deg, #4848c4 0%, #1c1c7a 100%);
+      border-radius: 50% 50% 44% 44%;
+      position:relative;
+      box-shadow: 0 14px 36px rgba(0,0,60,0.65), inset 0 1px 0 rgba(255,255,255,0.18);
+      border: 2px solid rgba(140,140,255,0.3);
+    ">
+      <!-- Eyebrows -->
+      <div id="browL" style="position:absolute;left:13px;top:15px;width:18px;height:3px;background:rgba(190,190,255,0.6);border-radius:2px;transition:transform 0.22s ease;"></div>
+      <div id="browR" style="position:absolute;right:13px;top:15px;width:18px;height:3px;background:rgba(190,190,255,0.6);border-radius:2px;transition:transform 0.22s ease;"></div>
+      <!-- Left eye -->
+      <div id="eyeL" style="
+        position:absolute; left:15px; top:28px;
+        width:21px; height:21px;
+        background:white; border-radius:50%;
+        display:flex; align-items:center; justify-content:center;
+        transition: transform 0.25s cubic-bezier(.2,.8,.2,1);
+        overflow:hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.12);
+      ">
+        <div id="pupilL" style="width:11px;height:11px;background:#16163c;border-radius:50%;transition:transform 0.09s ease;position:relative;">
+          <div style="position:absolute;width:3px;height:3px;background:rgba(255,255,255,0.9);border-radius:50%;top:1px;right:1px;"></div>
+        </div>
+        <div id="lidL" style="position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(180deg,#5050c8,#3030a0);transition:height 0.3s cubic-bezier(.4,0,.2,1);z-index:2;"></div>
+      </div>
+      <!-- Right eye -->
+      <div id="eyeR" style="
+        position:absolute; right:15px; top:28px;
+        width:21px; height:21px;
+        background:white; border-radius:50%;
+        display:flex; align-items:center; justify-content:center;
+        transition: transform 0.25s cubic-bezier(.2,.8,.2,1);
+        overflow:hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.12);
+      ">
+        <div id="pupilR" style="width:11px;height:11px;background:#16163c;border-radius:50%;transition:transform 0.09s ease;position:relative;">
+          <div style="position:absolute;width:3px;height:3px;background:rgba(255,255,255,0.9);border-radius:50%;top:1px;right:1px;"></div>
+        </div>
+        <div id="lidR" style="position:absolute;top:0;left:0;right:0;height:0;background:linear-gradient(180deg,#5050c8,#3030a0);transition:height 0.3s cubic-bezier(.4,0,.2,1);z-index:2;"></div>
+      </div>
+      <!-- Blush -->
+      <div style="position:absolute;bottom:11px;left:7px;width:16px;height:8px;border-radius:50%;background:rgba(255,100,150,0.22);"></div>
+      <div style="position:absolute;bottom:11px;right:7px;width:16px;height:8px;border-radius:50%;background:rgba(255,100,150,0.22);"></div>
+    </div>
+  </div>
+
+  <div class="gate-card" style="position:relative;z-index:2;overflow:visible;">
+    <div class="gate-logo">Makej!</div>
+    <div class="gate-sub">pro brigádníky</div>
+    <div class="gate-tabs">
+      <button class="gate-tab active" id="tab-login" onclick="switchGateTab('login')">Přihlásit se</button>
+      <button class="gate-tab" id="tab-register" onclick="switchGateTab('register')">Registrovat</button>
+    </div>
+    <div class="gate-error" id="gate-error"></div>
+
+    <!-- Login form -->
+    <div id="gate-login-form">
+      <input class="gate-input" type="email" id="gate-email" placeholder="tvuj@email.cz" autocomplete="email" />
+      <input class="gate-input" type="password" id="gate-password" placeholder="Heslo" autocomplete="current-password" />
+      <button class="gate-btn" id="gate-submit">Přihlásit se</button>
+    </div>
+
+    <!-- Register form -->
+    <div id="gate-register-form" style="display:none">
+      <input class="gate-input" type="text" id="reg-name" placeholder="Jméno a příjmení" autocomplete="name" />
+      <input class="gate-input" type="email" id="reg-email" placeholder="tvuj@email.cz" autocomplete="email" />
+      <input class="gate-input" type="password" id="reg-password" placeholder="Heslo (min. 6 znaků)" autocomplete="new-password" />
+      <button class="gate-btn" id="reg-submit">Vytvořit účet brigádníka</button>
+    </div>
+
+    <button class="gate-link" onclick="window.location.href='../'">← Zpět na makej.cz</button>
+  </div><!-- end gate-card -->
+  </div><!-- end card column -->
+  </div><!-- end outer row -->
+</div>
+
+<div id="root"></div>
+
+<script>
+  const SUPABASE_URL = 'https://cxegfwfbgcgpwerfbvra.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_N_BIwMCTD6ZOTrtBl3juyw_CGIQ_lvh';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession: true, storageKey: 'makej-auth' }
+  });
+
+  const gate = document.getElementById('auth-gate');
+  const gateError = document.getElementById('gate-error');
+
+  function showGate() { gate.classList.remove('hidden'); }
+  function hideGate() { gate.classList.add('hidden'); }
+  function showErr(msg) { gateError.textContent = msg; gateError.style.display = 'block'; }
+  function clearErr() { gateError.style.display = 'none'; }
+
+  function switchGateTab(tab) {
+    document.getElementById('gate-login-form').style.display = tab === 'login' ? '' : 'none';
+    document.getElementById('gate-register-form').style.display = tab === 'register' ? '' : 'none';
+    document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+    document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+    clearErr();
+  }
+
+  function translateErr(msg) {
+    if (msg.includes('Invalid login credentials')) return 'Nesprávný email nebo heslo.';
+    if (msg.includes('Email not confirmed')) return 'Nejdřív potvrď svůj email.';
+    if (msg.includes('User already registered') || msg.includes('already been registered')) return 'Tento email je již zaregistrovaný.';
+    if (msg.includes('Password should be at least')) return 'Heslo musí mít alespoň 6 znaků.';
+    return msg;
+  }
+
+  // Login
+  document.getElementById('gate-submit').addEventListener('click', async () => {
+    clearErr();
+    const email = document.getElementById('gate-email').value.trim();
+    const password = document.getElementById('gate-password').value;
+    if (!email || !password) { showErr('Vyplň email a heslo.'); return; }
+    const btn = document.getElementById('gate-submit');
+    btn.disabled = true; btn.textContent = 'Přihlašuji...';
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) { showErr(translateErr(error.message)); btn.disabled = false; btn.textContent = 'Přihlásit se'; return; }
+    const role = data.user?.user_metadata?.role;
+    if (role === 'employer') {
+      showErr('Tento účet je zaměstnavatelský. Pokračuj na dashboard.');
+      btn.disabled = false; btn.textContent = 'Přihlásit se';
+      setTimeout(() => { window.location.href = '../employer/'; }, 1500);
+      return;
+    }
+    window.location.reload();
+  });
+
+  document.getElementById('gate-password').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('gate-submit').click(); });
+
+  // Register
+  document.getElementById('reg-submit').addEventListener('click', async () => {
+    clearErr();
+    const name = document.getElementById('reg-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const password = document.getElementById('reg-password').value;
+    if (!name || !email || !password) { showErr('Vyplň všechna pole.'); return; }
+    if (password.length < 6) { showErr('Heslo musí mít alespoň 6 znaků.'); return; }
+    const btn = document.getElementById('reg-submit');
+    btn.disabled = true; btn.textContent = 'Registruji...';
+    const { error } = await sb.auth.signUp({ email, password, options: { data: { name, role: 'worker' } } });
+    if (error) { showErr(translateErr(error.message)); btn.disabled = false; btn.textContent = 'Vytvořit účet brigádníka'; return; }
+    showErr('');
+    gateError.style.display = 'block';
+    gateError.style.background = 'rgba(91,214,138,0.12)';
+    gateError.style.borderColor = 'rgba(91,214,138,0.3)';
+    gateError.style.color = '#5BD68A';
+    gateError.textContent = 'Účet vytvořen! Zkontroluj email pro potvrzení, pak se přihlas.';
+    btn.disabled = false; btn.textContent = 'Vytvořit účet brigádníka';
+    switchGateTab('login');
+  });
+
+  // Check existing session
+  sb.auth.getSession().then(({ data: { session } }) => {
+    const role = session?.user?.user_metadata?.role;
+    if (session && role !== 'employer') hideGate();
+    else showGate();
+  });
+</script>
+
+<script>
+(function() {
+  var peeker = document.getElementById('peeker');
+  var eyeL   = document.getElementById('eyeL');
+  var eyeR   = document.getElementById('eyeR');
+  var pupilL = document.getElementById('pupilL');
+  var pupilR = document.getElementById('pupilR');
+  var browL  = document.getElementById('browL');
+  var browR  = document.getElementById('browR');
+  var lidL   = document.getElementById('lidL');
+  var lidR   = document.getElementById('lidR');
+  var eyeLs   = document.getElementById('eyeL-s');
+  var eyeRs   = document.getElementById('eyeR-s');
+  var pupilLs = document.getElementById('pupilL-s');
+  var pupilRs = document.getElementById('pupilR-s');
+  var lidLs   = document.getElementById('lidL-s');
+  var lidRs   = document.getElementById('lidR-s');
+  var isPwd      = false;
+  var isEyeOpen  = false;
+  var peekTimers = [];
+  var blinkTimer = null;
+
+  function setLidTransition(speed) {
+    lidL.style.transition = 'height ' + speed + ' ease';
+    lidR.style.transition = 'height ' + speed + ' ease';
+  }
+
+  function movePupil(pupilEl, eyeEl, mx, my, maxR) {
+    var rect = eyeEl.getBoundingClientRect();
+    var cx = rect.left + rect.width  / 2;
+    var cy = rect.top  + rect.height / 2;
+    var dx = mx - cx, dy = my - cy;
+    var dist = Math.sqrt(dx * dx + dy * dy);
+    var r = maxR || 4.5;
+    var s = Math.min(dist, r) / Math.max(dist, 0.001);
+    pupilEl.style.transform = 'translate(' + (dx * s).toFixed(2) + 'px,' + (dy * s).toFixed(2) + 'px)';
+  }
+
+  document.addEventListener('mousemove', function(e) {
+    movePupil(pupilL,  eyeL,  e.clientX, e.clientY);
+    movePupil(pupilR,  eyeR,  e.clientX, e.clientY);
+    movePupil(pupilLs, eyeLs, e.clientX, e.clientY, 9);
+    movePupil(pupilRs, eyeRs, e.clientX, e.clientY, 9);
+  });
+
+  // ── Normální mrknutí každých 5s ──────────────────────────────
+  function scheduleBlink() {
+    blinkTimer = setTimeout(function() {
+      if (isPwd) return;
+      setLidTransition('0.08s');
+      lidL.style.height = '21px';
+      lidR.style.height = '21px';
+      lidLs.style.transition = 'height 0.08s ease';
+      lidRs.style.transition = 'height 0.08s ease';
+      lidLs.style.height = '42px';
+      lidRs.style.height = '42px';
+      setTimeout(function() {
+        lidL.style.height = '0';
+        lidR.style.height = '0';
+        lidLs.style.height = '0';
+        lidRs.style.height = '0';
+        setTimeout(function() {
+          setLidTransition('0.28s');
+          lidLs.style.transition = 'height 0.28s ease';
+          lidRs.style.transition = 'height 0.28s ease';
+          scheduleBlink();
+        }, 120);
+      }, 100);
+    }, 5000);
+  }
+
+  function stopBlink() { clearTimeout(blinkTimer); blinkTimer = null; }
+
+  // ── Tajné koukání při hesle ───────────────────────────────────
+  function clearPeekTimers() {
+    peekTimers.forEach(clearTimeout);
+    peekTimers = [];
+  }
+
+  function schedulePeek() {
+    peekTimers.push(setTimeout(function() {
+      lidR.style.height = '11px';
+      isEyeOpen = true;
+      peekTimers.push(setTimeout(function() {
+        isEyeOpen = false;
+        lidR.style.height = '21px';
+        peekTimers.push(setTimeout(schedulePeek, 5000));
+      }, 1000));
+    }, 3000));
+  }
+
+  function peekAtPassword() {
+    isPwd = true;
+    stopBlink();
+    clearPeekTimers();
+    peeker.style.transform = 'translateY(-14px)';
+    setLidTransition('0.28s');
+    lidL.style.height = '21px';
+    lidR.style.height = '21px';
+    browL.style.transform = 'translateY(5px)';
+    browR.style.transform = 'translateY(5px)';
+    schedulePeek();
+  }
+
+  function stopPeeking() {
+    isPwd = false;
+    isEyeOpen = false;
+    clearPeekTimers();
+    peeker.style.transform = '';
+    setLidTransition('0.28s');
+    lidL.style.height = '0';
+    lidR.style.height = '0';
+    browL.style.transform = '';
+    browR.style.transform = '';
+    scheduleBlink();
+  }
+
+  ['gate-password', 'reg-password'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('focus', peekAtPassword);
+    el.addEventListener('blur',  stopPeeking);
+  });
+
+  scheduleBlink(); // spustí normální mrkání hned od začátku
+})();
+</script>
+
+<script type="text/babel" src="../employer/app.jsx"></script>
+<script type="text/babel" src="worker-supabase.jsx"></script>
+<script type="text/babel" src="worker-swipe.jsx"></script>
+<script type="text/babel" src="worker-messages.jsx"></script>
+<script type="text/babel" src="worker-profile.jsx"></script>
+<script type="text/babel" src="worker-main.jsx"></script>
+</body>
+</html>

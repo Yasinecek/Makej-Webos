@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Přehled barev – Makej</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: #060912;
+    color: #fff;
+    padding: 40px 24px 80px;
+    line-height: 1.6;
+  }
+
+  h1 { font-family: 'Inter', sans-serif; font-size: 1.6rem; font-weight: 800; margin-bottom: 6px; }
+  .subtitle { color: #8899bb; margin-bottom: 52px; font-size: .9rem; }
+
+  .section { margin-bottom: 52px; }
+  .section-title {
+    font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    color: #8899bb; margin-bottom: 20px; padding-bottom: 8px;
+    border-bottom: 1px solid #1a2140;
+  }
+
+  /* ── řádek barvy ── */
+  .color-row {
+    display: flex; align-items: flex-start; gap: 20px;
+    padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,.05);
+  }
+  .color-row:last-child { border-bottom: none; }
+
+  .chip {
+    flex-shrink: 0; width: 56px; height: 56px; border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.1);
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .color-meta { flex: 0 0 200px; }
+  .color-name { font-weight: 800; font-size: .9rem; }
+  .color-hex  { font-family: 'JetBrains Mono', monospace; font-size: .78rem; color: #8899bb; margin-top: 1px; }
+  .color-use  { font-size: .78rem; color: #8899bb; margin-top: 4px; line-height: 1.4; }
+
+  .color-example { flex: 1; display: flex; align-items: center; }
+
+  /* ── ukázky z webu ── */
+  .ex-bg-page {
+    width: 180px; height: 56px; border-radius: 8px;
+    background: linear-gradient(180deg, #0020f6 0%, #050510 100%);
+    display: flex; align-items: flex-end; padding: 6px 10px;
+    font-size: .7rem; color: rgba(255,255,255,.5);
+  }
+  .ex-bg-body {
+    width: 180px; height: 56px; border-radius: 8px;
+    background: #060912; border: 1px solid #1a2140;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .8rem; color: #8899bb;
+  }
+  .ex-card {
+    background: #111828; border: 1px solid #1a2140; border-radius: 12px;
+    padding: 12px 16px;
+  }
+  .ex-card-title { font-weight: 800; font-size: .92rem; }
+  .ex-card-sub   { font-size: .78rem; color: #8899bb; margin-top: 2px; }
+
+  .ex-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 20px; border-radius: 100px;
+    background: linear-gradient(135deg, #1e2d78, #2a3d99);
+    color: #fff; font-weight: 700; font-size: .85rem; font-family: inherit;
+    border: none; cursor: default;
+  }
+  .ex-btn-ghost {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 20px; border-radius: 100px;
+    background: transparent; border: 1px solid rgba(208,208,255,.25);
+    color: #c0caff; font-weight: 700; font-size: .85rem; font-family: inherit;
+    cursor: default;
+  }
+
+  .ex-gradient-text {
+    font-family: 'Inter', sans-serif; font-size: 1.5rem; font-weight: 800;
+    background: linear-gradient(135deg, #7c7cff, #d0d0ff, #a78bfa);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .ex-tag {
+    display: inline-block; padding: 5px 14px; border-radius: 100px;
+    background: rgba(41,41,120,.4); border: 1px solid rgba(208,208,255,.15);
+    color: #c0caff; font-size: .78rem; font-weight: 700;
+    letter-spacing: .05em; text-transform: uppercase;
+  }
+
+  .ex-secondary-text { color: #c0caff; font-weight: 600; font-size: .9rem; }
+
+  .ex-muted-panel {
+    background: #1a2140; border-radius: 8px; padding: 10px 14px;
+    font-size: .82rem; color: #8899bb; max-width: 260px;
+  }
+  .ex-muted-text { color: #8899bb; font-size: .88rem; }
+
+  .ex-border-demo {
+    border: 1px solid #1a2140; border-radius: 10px; padding: 10px 14px;
+    font-size: .82rem; color: #8899bb;
+  }
+
+  .ex-badge-urgent {
+    display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 100px;
+    background: rgba(248,113,113,.15); border: 1px solid rgba(248,113,113,.4);
+    color: #f87171; font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    animation: badge-pulse 1.4s ease-in-out infinite;
+  }
+  .ex-badge-featured {
+    display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 100px;
+    background: rgba(56,182,255,.15); border: 1px solid rgba(56,182,255,.4);
+    color: #38b6ff; font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  }
+  @keyframes badge-pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(248,113,113,.45); }
+    50%      { box-shadow: 0 0 0 5px rgba(248,113,113,0); }
+  }
+
+  .ex-dpp-pill {
+    display: inline-block; padding: 3px 12px; border-radius: 100px;
+    background: rgba(250,204,21,.12); border: 1px solid rgba(250,204,21,.35);
+    color: #facc15; font-size: .75rem; font-weight: 700;
+  }
+  .ex-speed-count { font-family: 'Inter', sans-serif; font-size: 2rem; font-weight: 800; color: #4ade80; line-height: 1; }
+  .ex-speed-label { font-size: .78rem; color: #4ade80; font-weight: 700; margin-top: 2px; }
+
+  .ex-destructive {
+    display: inline-flex; align-items: center; padding: 8px 18px; border-radius: 100px;
+    background: #f43f5e; color: #fff; font-weight: 700; font-size: .85rem;
+  }
+
+  .ex-hero-stat { text-align: center; }
+  .ex-hero-stat-num { font-family: 'Inter', sans-serif; font-size: 1.5rem; font-weight: 900; color: #fff; }
+  .ex-hero-stat-label { font-size: .75rem; color: #8899bb; font-weight: 600; }
+
+  .gap-column { display: flex; flex-direction: column; gap: 8px; }
+  .gap-row    { display: flex; flex-direction: row; gap: 10px; align-items: center; }
+</style>
+</head>
+<body>
+
+<h1>Přehled barev – Makej</h1>
+<p class="subtitle">Každá barva + přesná ukázka jak to vypadá na webu</p>
+
+<!-- ──────── POZADÍ ──────── -->
+<div class="section">
+  <div class="section-title">Pozadí</div>
+
+  <div class="color-row">
+    <div class="chip" style="background:linear-gradient(180deg,#0020f6 0%,#050510 100%)"></div>
+    <div class="color-meta">
+      <div class="color-name">Přechod pozadí stránky</div>
+      <div class="color-hex">#0020f6 → #050510</div>
+      <div class="color-use">body::before — vrstva přes celou stránku shora dolů</div>
+    </div>
+    <div class="color-example">
+      <div class="ex-bg-page">pozadí stránky</div>
+    </div>
+  </div>
+
+  <div class="color-row">
+    <div class="chip" style="background:#060912"></div>
+    <div class="color-meta">
+      <div class="color-name">body background</div>
+      <div class="color-hex">#060912</div>
+      <div class="color-use">Základní barva body tagu pod přechodem</div>
+    </div>
+    <div class="color-example">
+      <div class="ex-bg-body">body pozadí</div>
+    </div>
+  </div>
+
+  <div class="color-row">
+    <div class="chip" style="background:#0a0f20"></div>
+    <div class="color-meta">
+      <div class="color-name">--bg</div>
+      <div class="color-hex">#0a0f20</div>
+      <div class="color-use">CSS proměnná pozadí — fallback</div>
+    </div>
+    <div class="color-example">
+      <div class="ex-bg-body" style="background:#0a0f20">--bg fallback</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ──────── KARTY & PANELY ──────── -->
+<div class="section">
+  <div class="section-title">Karty a panely</div>
+
+  <div class="color-row">
+    <div class="chip" style="background:#111828"></div>
+    <div class="color-meta">
+      <div class="color-name">--card</div>
+      <div class="color-hex">#111828</div>
+      <div class="color-use">Pozadí feature karet, testimonialů, download sekce</div>
+    </div>
+    <div class="color-example">
+      <div class="ex-card">
+        <div class="ex-card-title">Barista</div>
+        <div class="ex-card-sub">180 Kč/hod · Brigáda</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="color-row">
+    <div class="chip" style="background:#1a2140"></div>
+    <div class="color-meta">
+      <div class="color-name">--muted / --border</div>
+      <div class="color-hex">#1a2140</div>
+      <div class="color-use">Ztlumené panely, okraje karet a sekcí</div>
+    </div>
+    <div class="color-example">
+      <div class="ex-muted-panel">
+        Odměny získáváš za každou brigádu a vyměňuješ za slevy a vouchery.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ──────── TLAČÍTKA ──────── -->
+<div class="section">
+  <div class="section-title">Tlačítka a interaktivní prvky</div>
+
+  <div class="color-row">
+    <div class="chip" style="background:linear-gradient(135deg,#1e2d78,#2a3d99)"></div>
+    <div class="color-meta">
+      <div class="color-name">--primary → --accent</div>
+      <div class="color-hex">#1e2d78 → #2a3d99</div>
+      <div class="color-use">Hlavní tlačítka, hlavičky feature karet</div>
+    </div>
+    <div class="color-example">
+      <div class="gap-column">
+        <button class="ex-btn">Stáhnout zdarma</button>
+        <button class="ex-btn">Vytvořit účet</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="color-row">
+    <div class="chip" style="background:transparent;border:1px solid rgba(208,208,255,.25)"></div>
+    <div class="color-meta">
+      <div class="color-name">btn-ghost</div>
+      <div class="color-hex">průhledné + border #c0caff</div>
+      <div class="color-use">Sekundární tlačítka (Přihlásit se, Jak to funguje?)</div>
+    </div>
+    <div class="color-example">
+      <button class="ex-btn-ghost">Jak to funguje?</button>
+    </div>
+  </div>
+
+  <div class="color-row">
+    <div class="chip" style="background:#f43f5e"></div>
+    <div class="color-meta">
+      <div class="color-name">--destructive</div>
+      <div class="color-hex">#f43f5e</div>
+      <div class="color-use">Chybové stavy, mazání, varování</div>
+    </div>
+    <div class="color-example">
+      <div class="ex-destructive">Smazat účet</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ──────── TEXT ──────── -->
+<div class="section">
+  <div class="section-title">Texty</div>
+
+  <div class="color-row">
+    <div class="chip" style="background:linear-gradient(135deg,#7c7cff,#d0d0ff,#a78bfa)"></div>
+    <div class="color-meta">
+      <div class="color-name">gradient-text</div>
+      <div class="color-hex">#7c7cff → #d0d0ff → #a78bfa</div>
+      <div class="color-use">Nadpisy hero sekce, nadpisy sekcí (Matchuj., Swipuj…)</div>
+    </div>
+    <div class="color-example">
+      <div class="ex-gradient-text">Matchuj.</div>
+    </div>
+  </div>
+
+  <div class="color-row">
+    <div class="chip" style="background:#ffffff"></div>
+    <div class="color-meta">
+      <div class="color-name">--fg</div>
+      <div class="color-hex">#ffffff</div>
+      <div class="color-use">Hlavní text stránky, nadpisy karet</div>
+    </div>
+    <div class="color-example">
+      <div style="font-size:1rem;font-weight:700;color:#fff">Najdi si brigádu za pár sekund.</div>
+    </div>
+  </div>
+
+  <div class="color-row">
+    <div class="chip" style="background:#8899bb"></div>
+    <div class="color-meta">
+      <div class="color-name">--muted-fg</div>
+      <div class="color-hex">#8899bb</div>
+      <div class="color-use">Popisné texty, subtitly sekcí, popisy karet</div>
+    </div>
+    <div class="color-example">
+      <div class="ex-muted-text">Swipni doprava, matchni se s firmou a začni vydělávat ještě dnes.</div>
+    </div>
+  </div>
+
+  <div class="color-row">
+    <div class="chip" style="background:#c0caff"></div>
+    <div class="color-meta">
+      <div class="color-name">--secondary</div>
+      <div class="color-hex">#c0caff</div>
+      <div class="color-use">Section tagy, ghost tlačítko text, pilly tagů</div>
+    </div>
+    <div class="color-example">
+      <div class="gap-column">
+        <div class="ex-tag">Pro brigádníky</div>
+        <div class="ex-secondary-text">#1 brigádní appka v Česku</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="color-row">
+    <div class="chip" style="background:#8899bb"></div>
+    <div class="color-meta">
+      <div class="color-name">Hero statistiky</div>
+      <div class="color-hex">bílá čísla + #8899bb popisky</div>
+      <div class="color-use">Stats v hero sekci (5000+ brigád, 12 000+ brigádníků…)</div>
+    </div>
+    <div class="color-example">
+      <div class="gap-row">
+        <div class="ex-hero-stat">
+          <div class="ex-hero-stat-num">5 000+</div>
+          <div class="ex-hero-stat-label">Aktivních nabídek</div>
+        </div>
+        <div style="width:1px;height:36px;background:#1a2140"></div>
+        <div class="ex-hero-stat">
+          <div class="ex-hero-stat-num">98%</div>
+          <div class="ex-hero-stat-label">Spokojenost</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ──────── SPECIÁLNÍ PRVKY ──────── -->
+<div class="section">
+  <div class="section-title">Speciální prvky (popup swipe karet)</div>
+
+  <div class="color-row">
+    <div class="chip" style="background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.4)"></div>
+    <div class="color-meta">
+      <div class="color-name">Badge – Spěchá</div>
+      <div class="color-hex">#f87171 (červená)</div>
+      <div class="color-use">Pulzující badge na urgentních brigádách (Kuchař, Stěhování…)</div>
+    </div>
+    <div class="color-example">
+      <span class="ex-badge-urgent">Spěchá</span>
+    </div>
+  </div>
+
+  <div class="color-row">
+    <div class="chip" style="background:rgba(56,182,255,.15);border:1px solid rgba(56,182,255,.4)"></div>
+    <div class="color-meta">
+      <div class="color-name">Badge – Topováno</div>
+      <div class="color-hex">#38b6ff (modrá)</div>
+      <div class="color-use">Badge na zvýrazněných kartách (Barista, Mistr výroby…)</div>
+    </div>
+    <div class="color-example">
+      <span class="ex-badge-featured">Topováno</span>
+    </div>
+  </div>
+
+  <div class="color-row">
+    <div class="chip" style="background:rgba(250,204,21,.12);border:1px solid rgba(250,204,21,.35)"></div>
+    <div class="color-meta">
+      <div class="color-name">Pill – DPP / HPP</div>
+      <div class="color-hex">#facc15 (žlutá)</div>
+      <div class="color-use">Typ smlouvy v popup kartě brigády nebo full-time pozice</div>
+    </div>
+    <div class="color-example">
+      <div class="gap-row">
+        <span class="ex-dpp-pill">DPP/DPČ</span>
+        <span class="ex-dpp-pill">HPP</span>
+        <span class="ex-dpp-pill">HPP/IČO</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="color-row">
+    <div class="chip" style="background:#4ade80"></div>
+    <div class="color-meta">
+      <div class="color-name">Speed viz – Makej</div>
+      <div class="color-hex">#4ade80 (zelená)</div>
+      <div class="color-use">Zelené číslo, popisek a slider v kartě „12× rychlejší nábor"</div>
+    </div>
+    <div class="color-example">
+      <div class="gap-column">
+        <div class="ex-speed-count">24</div>
+        <div class="ex-speed-label">Makej</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
