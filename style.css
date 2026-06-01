@@ -17,7 +17,8 @@
   --font-heading: 'Inter', sans-serif;
 }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; scrollbar-width: none; }
+html::-webkit-scrollbar { display: none; }
 body {
   background: #060912;
   color: var(--fg);
@@ -38,9 +39,10 @@ img { max-width: 100%; display: block; }
 .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
 
 .gradient-text {
-  background: none;
-  -webkit-background-clip: unset; background-clip: unset;
-  -webkit-text-fill-color: var(--primary);
+  background: linear-gradient(90deg, #1a8fd1 0%, #38b6ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 .xmas-gift {
   display: inline-flex;
@@ -228,10 +230,6 @@ img { max-width: 100%; display: block; }
 }
 .hero-learn-more:hover { color: var(--secondary); }
 
-.hero-scroll-indicator {
-  position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
-  color: var(--muted-fg); animation: bounce 2s infinite;
-}
 
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(30px); }
