@@ -127,8 +127,8 @@ img { max-width: 100%; display: block; }
   transition: all .3s; cursor: pointer;
 }
 .btn-ghost:hover { background: rgba(208,208,255,.08); border-color: rgba(208,208,255,.4); }
-#hero-login-btn { background: #ffffff; color: var(--primary); border-color: #ffffff; font-weight: 700; }
-#hero-login-btn:hover { background: rgba(255,255,255,.88); border-color: rgba(255,255,255,.88); }
+#hero-login-btn, #nav-login-btn { background: #ffffff; color: var(--primary); border-color: #ffffff; font-weight: 700; }
+#hero-login-btn:hover, #nav-login-btn:hover { background: rgba(255,255,255,.88); border-color: rgba(255,255,255,.88); }
 .btn-lg { padding: 16px 32px; font-size: 1.05rem; }
 
 /* ═══════════ NAVBAR ═══════════ */
