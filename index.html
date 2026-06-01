@@ -13,14 +13,14 @@
   <script src="/iconify-solar.js"></script>
   <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js" async></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=3" />
 </head>
 <body>
 
   <!-- ═══════════ NAVBAR ═══════════ -->
   <nav id="navbar">
     <div class="nav-inner">
-      <a href="#" class="nav-logo">Makej!</a>
+      <a href="#" class="nav-logo">Makej</a>
       <div class="nav-links">
         <a href="#how-it-works">Jak to funguje</a>
         <a href="#features">Funkce</a>
@@ -28,7 +28,7 @@
         <a href="#about">O nás</a>
         <a href="#download">Stáhnout</a>
       </div>
-      <div class="nav-actions">
+      <div class="nav-actions" id="nav-actions">
         <a href="javascript:void(0)" class="btn-ghost" id="nav-login-btn">Přihlásit se</a>
         <a href="javascript:void(0)" class="btn-primary" id="nav-register-btn">Vytvořit účet</a>
       </div>
@@ -63,11 +63,10 @@
         <p class="hero-subtitle">Najdi si brigádu za pár sekund. Swipni doprava, matchni se s&nbsp;firmou a začni vydělávat ještě dnes.</p>
         <div class="hero-cta">
           <a href="javascript:void(0)" class="btn-primary btn-lg" id="hero-register-btn">
-            <iconify-icon icon="solar:user-plus-bold" width="20"></iconify-icon>
+            <iconify-icon icon="solar:add-bold" width="26" style="color:#fff"></iconify-icon>
             Vytvořit účet zdarma
           </a>
           <a href="javascript:void(0)" class="btn-ghost btn-lg" id="hero-login-btn">
-            <iconify-icon icon="solar:login-bold" width="20"></iconify-icon>
             Přihlásit se
           </a>
         </div>
@@ -1242,7 +1241,7 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="script.js"></script>
+  <script src="script.js?v=3"></script>
   <script>
 (function() {
   var peeker = document.getElementById('main-peeker');

@@ -40,7 +40,7 @@ img { max-width: 100%; display: block; }
 .gradient-text {
   background: none;
   -webkit-background-clip: unset; background-clip: unset;
-  -webkit-text-fill-color: #ffffff;
+  -webkit-text-fill-color: var(--primary);
 }
 .xmas-gift {
   display: inline-flex;
@@ -127,6 +127,8 @@ img { max-width: 100%; display: block; }
   transition: all .3s; cursor: pointer;
 }
 .btn-ghost:hover { background: rgba(208,208,255,.08); border-color: rgba(208,208,255,.4); }
+#hero-login-btn { background: #ffffff; color: var(--primary); border-color: #ffffff; font-weight: 700; }
+#hero-login-btn:hover { background: rgba(255,255,255,.88); border-color: rgba(255,255,255,.88); }
 .btn-lg { padding: 16px 32px; font-size: 1.05rem; }
 
 /* ═══════════ NAVBAR ═══════════ */
@@ -135,22 +137,41 @@ img { max-width: 100%; display: block; }
   padding: 16px 24px; transition: all .3s;
 }
 #navbar.scrolled {
-  background: rgba(10,10,35,.95);
-  border-bottom: 1px solid rgba(208,208,255,.08);
+  background: rgba(5, 7, 26, 0.15);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: none;
+  box-shadow: none;
 }
 .nav-inner {
   max-width: 1200px; margin: 0 auto;
   display: flex; align-items: center; justify-content: space-between;
+  position: relative;
 }
 .nav-logo {
   font-family: var(--font-heading); font-size: 1.8rem; font-weight: 900;
-  background: linear-gradient(135deg, #7c7cff, #d0d0ff);
-  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  background: none; -webkit-background-clip: unset; background-clip: unset;
+  -webkit-text-fill-color: #ffffff; color: #ffffff;
 }
-.nav-links { display: flex; gap: 32px; }
-.nav-links a { color: var(--muted-fg); font-weight: 500; font-size: .9rem; transition: color .2s; }
+.nav-links {
+  display: flex; gap: 32px; align-items: center;
+  position: absolute; left: 0; right: 0; justify-content: center;
+}
+.nav-links a {
+  color: #ffffff; font-weight: 500; font-size: .9rem;
+  padding-bottom: 4px;
+  border-bottom: 2px solid transparent;
+  transition: color .2s, font-size .2s, font-weight .2s, border-bottom-color .2s;
+}
 .nav-links a:hover { color: #fff; }
-.nav-actions { display: flex; gap: 12px; align-items: center; }
+.nav-links a.nav-active {
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  border-bottom-color: #ffffff;
+}
+.nav-actions { display: flex; gap: 12px; align-items: center; opacity: 0; pointer-events: none; transition: opacity .3s; }
+.nav-actions.nav-actions-visible { opacity: 1; pointer-events: all; }
 .nav-actions .btn-ghost, .nav-actions .btn-primary { padding: 10px 20px; font-size: .85rem; }
 .mobile-menu-btn { display: none; background: none; border: none; color: #fff; cursor: pointer; }
 .mobile-menu {
@@ -170,7 +191,7 @@ img { max-width: 100%; display: block; }
 /* ═══════════ HERO ═══════════ */
 #hero {
   min-height: 100vh; display: flex; align-items: center; justify-content: center;
-  padding: 140px 24px 100px; position: relative; overflow: hidden;
+  padding: 115px 24px 130px; position: relative; overflow: hidden;
 }
 .hero-bg-particles {
   position: absolute; inset: 0; pointer-events: none;
@@ -188,24 +209,24 @@ img { max-width: 100%; display: block; }
 .hero-text h1 {
   font-family: var(--font-heading); font-size: clamp(3.8rem,9vw,7rem);
   font-weight: 900; line-height: 1.02; margin-bottom: 28px;
-  display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
   animation: fadeInUp .6s ease-out both;
 }
 .hero-line {
   display: block; text-align: left; line-height: 1.1; position: relative;
 }
 .hero-subtitle {
-  color: var(--muted-fg); font-size: 1.15rem; max-width: 520px;
+  color: #ffffff; font-size: 1.15rem; max-width: 520px;
   margin-bottom: 40px; animation: fadeInUp .6s ease-out .15s both;
 }
 .hero-cta { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-bottom: 28px; animation: fadeInUp .6s ease-out .3s both; }
 .hero-learn-more {
-  color: var(--muted-fg); font-size: .82rem;
-  display: inline-flex; align-items: center; gap: 6px;
+  color: #ffffff; font-size: 1rem;
+  display: inline-flex; align-items: center; gap: 8px;
   text-decoration: none; transition: color .2s;
   animation: fadeInUp .6s ease-out .4s both;
 }
-.hero-learn-more:hover { color: #fff; }
+.hero-learn-more:hover { color: var(--secondary); }
 
 .hero-scroll-indicator {
   position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);

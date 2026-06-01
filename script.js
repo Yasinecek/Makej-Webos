@@ -1,8 +1,34 @@
-// ═══════════ NAVBAR SCROLL ═══════════
+// ═══════════ NAVBAR SCROLL + SCROLLSPY ═══════════
 const navbar = document.getElementById('navbar');
-window.addEventListener('scroll', () => {
-  navbar.classList.toggle('scrolled', window.scrollY > 50);
-}, { passive: true });
+const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+const navActions = document.getElementById('nav-actions');
+const spySections = ['how-it-works', 'features', 'employers', 'about', 'download']
+  .map(id => document.getElementById(id)).filter(Boolean);
+
+function updateNav() {
+  const scrollY = window.scrollY;
+  navbar.classList.toggle('scrolled', scrollY > 50);
+
+  if (navActions) {
+    const hero = document.getElementById('hero');
+    navActions.classList.toggle('nav-actions-visible', hero ? scrollY > hero.offsetHeight * 0.8 : scrollY > 400);
+  }
+
+  const mid = window.innerHeight * 0.35;
+  let active = null;
+  spySections.forEach(sec => {
+    const rect = sec.getBoundingClientRect();
+    if (rect.top <= mid) active = sec;
+  });
+
+  navLinks.forEach(a => {
+    const matches = active && a.getAttribute('href') === '#' + active.id;
+    a.classList.toggle('nav-active', matches);
+  });
+}
+
+window.addEventListener('scroll', updateNav, { passive: true });
+updateNav();
 
 // ═══════════ MOBILE MENU ═══════════
 const menuBtn = document.getElementById('mobile-menu-btn');
