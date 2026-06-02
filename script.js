@@ -1,8 +1,34 @@
-// ═══════════ NAVBAR SCROLL ═══════════
+// ═══════════ NAVBAR SCROLL + SCROLLSPY ═══════════
 const navbar = document.getElementById('navbar');
-window.addEventListener('scroll', () => {
-  navbar.classList.toggle('scrolled', window.scrollY > 50);
-}, { passive: true });
+const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+const navActions = document.getElementById('nav-actions');
+const spySections = ['how-it-works', 'features', 'employers', 'about', 'download']
+  .map(id => document.getElementById(id)).filter(Boolean);
+
+function updateNav() {
+  const scrollY = window.scrollY;
+  navbar.classList.toggle('scrolled', scrollY > 50);
+
+  if (navActions) {
+    const hero = document.getElementById('hero');
+    navActions.classList.toggle('nav-actions-visible', hero ? scrollY > hero.offsetHeight * 0.8 : scrollY > 400);
+  }
+
+  const mid = window.innerHeight * 0.35;
+  let active = null;
+  spySections.forEach(sec => {
+    const rect = sec.getBoundingClientRect();
+    if (rect.top <= mid) active = sec;
+  });
+
+  navLinks.forEach(a => {
+    const matches = active && a.getAttribute('href') === '#' + active.id;
+    a.classList.toggle('nav-active', matches);
+  });
+}
+
+window.addEventListener('scroll', updateNav, { passive: true });
+updateNav();
 
 // ═══════════ MOBILE MENU ═══════════
 const menuBtn = document.getElementById('mobile-menu-btn');
@@ -579,14 +605,28 @@ function initAuth() {
   function clearErrors() {
     ['login-error', 'register-error'].forEach(id => {
       const el = document.getElementById(id);
-      if (el) { el.textContent = ''; el.style.display = 'none'; }
+      if (el) { el.textContent = ''; el.classList.remove('visible'); }
     });
   }
 
   function showError(id, msg) {
     const el = document.getElementById(id);
     el.textContent = msg;
-    el.style.display = 'block';
+    el.classList.add('visible');
+    if (id === 'login-error') {
+      const peeker = document.getElementById('main-peeker');
+      if (peeker) {
+        peeker.style.transition = 'none';
+        peeker.style.animation = 'none';
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          peeker.style.animation = 'peekerShake 0.55s ease-in-out both';
+          peeker.addEventListener('animationend', () => {
+            peeker.style.animation = '';
+            peeker.style.transition = '';
+          }, { once: true });
+        }));
+      }
+    }
   }
 
   // ─── Register steps ───
@@ -610,6 +650,7 @@ function initAuth() {
     const mobileActions = document.querySelector('.mobile-menu-actions');
 
     if (user) {
+      navbar.classList.add('nav-logged-in');
       const name = user.user_metadata?.name || user.email.split('@')[0];
       const role = user.user_metadata?.role;
       const dashBtn = role === 'employer'
@@ -636,6 +677,7 @@ function initAuth() {
       document.getElementById('logout-btn').addEventListener('click', () => sb.auth.signOut());
       document.getElementById('logout-btn-mobile').addEventListener('click', () => sb.auth.signOut());
     } else {
+      navbar.classList.remove('nav-logged-in');
       navActions.innerHTML = `
         <a href="javascript:void(0)" class="btn-ghost" id="nav-login-btn">Přihlásit se</a>
         <a href="javascript:void(0)" class="btn-primary" id="nav-register-btn">Vytvořit účet</a>
@@ -655,6 +697,17 @@ function initAuth() {
         if (el) el.addEventListener('click', e => { e.preventDefault(); openModal(type); });
       });
     }
+  }
+
+  // ─── Nav-actions: event delegation — funguje i po přepsání innerHTML ───
+  const navActionsEl = document.getElementById('nav-actions');
+  if (navActionsEl) {
+    navActionsEl.addEventListener('click', e => {
+      const btn = e.target.closest('#nav-login-btn, #nav-register-btn');
+      if (!btn) return;
+      e.preventDefault();
+      openModal(btn.id === 'nav-login-btn' ? 'login' : 'register');
+    });
   }
 
   // ─── Statická tlačítka (nejsou nikdy přepisována) — bindujeme jen jednou ───
