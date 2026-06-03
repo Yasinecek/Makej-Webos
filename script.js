@@ -78,7 +78,7 @@ function animateCounters() {
 // ═══════════ SCROLL REVEAL ═══════════
 function setupReveal() {
   const revealElements = document.querySelectorAll(
-    '.step-card, .feature-card, .testimonial-card, .download-card, .section-header'
+    '.feature-card, .testimonial-card, .download-card, .section-header'
   );
   revealElements.forEach(el => el.classList.add('reveal'));
 

@@ -554,23 +554,28 @@ img { max-width: 100%; display: block; }
 
 /* ═══════════ HOW IT WORKS ═══════════ */
 #how-it-works { padding: 120px 0; }
-.steps-grid { display: flex; align-items: stretch; justify-content: center; gap: 0; }
+.steps-grid { display: flex; align-items: stretch; justify-content: center; gap: 24px; }
 .step-card {
   flex: 1; max-width: 320px; padding: 40px 32px; border-radius: 20px;
   background: rgba(22,22,59,.5); border: 1px solid rgba(208,208,255,.08);
-  text-align: center; transition: all .4s;
+  text-align: center;
 }
-.step-card:hover { transform: translateY(-8px); border-color: rgba(208,208,255,.2); box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+.step-card:hover { border-color: rgba(208,208,255,.2); box-shadow: 0 20px 60px rgba(0,0,0,.3); }
 .step-number { font-family: var(--font-heading); font-size: 3rem; font-weight: 900; color: #ffffff; margin-bottom: 16px; }
 .step-icon-wrap {
-  width: 72px; height: 72px; margin: 0 auto 20px;
+  width: 72px; height: 72px; margin: 0 auto 8px;
   display: flex; align-items: center; justify-content: center;
   border-radius: 20px; background: linear-gradient(135deg, var(--primary), var(--accent));
   color: var(--secondary);
 }
+.step-icon-label {
+  display: block; text-align: center; font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: lowercase;
+  color: rgba(255,255,255,0.55); margin-bottom: 14px; line-height: 1;
+}
 .step-card h3 { font-family: var(--font-heading); font-size: 1.4rem; font-weight: 700; margin-bottom: 12px; }
-.step-card p { color: var(--muted-fg); font-size: .95rem; }
-.step-connector { color: rgba(208,208,255,.2); padding: 0 16px; display: flex; align-items: center; justify-content: center; }
+.step-card p { color: rgba(255,255,255,0.75); font-size: .95rem; }
+.step-connector { color: rgba(255,255,255,.55); padding: 0 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; min-width: 60px; animation: none; transition: none; }
 
 @media (max-width: 768px) {
   .steps-grid { flex-direction: column; gap: 24px; }
