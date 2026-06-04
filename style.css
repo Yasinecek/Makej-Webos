@@ -1055,6 +1055,7 @@ img { max-width: 100%; display: block; }
   88%      { transform: translateX(-50%) rotate(-4deg); }
 }
 #main-peeker.peeker-shake { animation: peekerShake 0.55s ease-in-out both; }
+@keyframes ant-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.6; } }
 
 
 .modal-overlay {
